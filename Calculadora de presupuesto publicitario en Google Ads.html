@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Presupuesto Google Ads</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+            display: inline-block;
+            width: 48%;
+            padding: 0 1%;
+        }
+        .full-width {
+            width: 100%;
+            display: block;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            font-size: 18px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .chart-container {
+            margin-top: 20px;
+        }
+        .instructions {
+            background-color: #e7f3fe;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+            font-size: 14px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+        }
+        .instructions > ol > li{
+            margin-bottom: 5px;
+        }
+        /* Optimización visual para dos columnas por fila */
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-row .form-group {
+            width: 48%;
+        }
+        .author{
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculadora de Presupuesto Publicitario en Google Ads</h1>
+
+    <!-- Sección de instrucciones -->
+    <div class="instructions">
+        <h3>Instrucciones:</h3>
+        <p>Sigue los siguientes pasos para calcular el presupuesto de tu campaña publicitaria en Google Ads:</p>
+        <ol>
+            <li>Selecciona el <strong>tipo de campaña</strong> (Búsqueda, Display, YouTube o Shopping).</li>
+            <li>Elige el <strong>dispositivo</strong> (Desktop o Mobile) para ajustar el CPC y el CTR promedio.</li>
+            <li>Introduce el <strong>presupuesto diario</strong> que planeas gastar y la <strong>duración de la campaña</strong> en días.</li>
+            <li>Selecciona la <strong>tasa de impuesto</strong> del país correspondiente.</li>
+            <li>Haz clic en el botón <strong>"Calcular Resultados"</strong> para obtener una estimación de clics, conversiones, CPA, ROAS y el gasto total con impuestos.</li>
+        </ol>
+        <p>Los resultados estimados se mostrarán debajo junto con un gráfico visual que representará los clics y conversiones proyectados.</p>
+    </div>
+
+    <!-- Organizando dos campos por fila -->
+    <div class="form-row">
+        <div class="form-group">
+            <label for="tipoCampana">Tipo de Campaña</label>
+            <select id="tipoCampana">
+                <option value="busqueda">Búsqueda</option>
+                <option value="display">Display</option>
+                <option value="youtube">YouTube</option>
+                <option value="shopping">Shopping</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="dispositivo">Dispositivo</label>
+            <select id="dispositivo" onchange="cambiarCPCyCTR()">
+                <option value="desktop">Desktop</option>
+                <option value="mobile">Mobile</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="presupuesto">Presupuesto Diario (USD)</label>
+            <input type="number" id="presupuesto" placeholder="Introduce tu presupuesto diario">
+        </div>
+
+        <div class="form-group">
+            <label for="dias">Duración de la Campaña (días)</label>
+            <input type="number" id="dias" placeholder="Introduce el número de días">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="impuesto">Tasa de Impuesto (%)</label>
+            <select id="impuesto">
+                <option value="0">Sin Impuesto</option>
+                <option value="20">IVA 20% (Unión Europea)</option>
+                <option value="5">DST 5% (Impuestos Digitales)</option>
+                <option value="10">IVA 10% (Latinoamérica)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cpc">Costo por Clic (CPC en USD)</label>
+            <input type="number" id="cpc" placeholder="Costo promedio por clic">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="ctr">CTR (Tasa de Clics %)</label>
+            <input type="number" id="ctr" placeholder="Introduce el CTR esperado">
+        </div>
+
+        <div class="form-group full-width">
+            <label for="conversion">Tasa de Conversión (%)</label>
+            <input type="number" id="conversion" placeholder="Introduce la tasa de conversión esperada">
+        </div>
+    </div>
+
+    <!-- Botón de cálculo -->
+    <button class="btn full-width" onclick="calcular()">Calcular Resultados</button>
+
+    <!-- Resultados -->
+    <div class="results" id="resultados">
+        <h2>Resultados Estimados</h2>
+        <div class="result-item" id="gasto"></div>
+        <div class="result-item" id="clics"></div>
+        <div class="result-item" id="conversiones"></div>
+        <div class="result-item" id="cpa"></div>
+        <div class="result-item" id="roas"></div>
+        <div class="result-item" id="impuestoResult"></div>
+        <div class="result-item" id="gastoConImpuesto"></div>
+    </div>
+
+    <!-- Gráfico -->
+    <div class="chart-container">
+        <canvas id="graficoClics"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function cambiarCPCyCTR() {
+        var dispositivo = document.getElementById("dispositivo").value;
+
+        if (dispositivo === "desktop") {
+            document.getElementById("cpc").value = 1.5; 
+            document.getElementById("ctr").value = 5;    
+        } else if (dispositivo === "mobile") {
+            document.getElementById("cpc").value = 1.2; 
+            document.getElementById("ctr").value = 3;    
+        }
+    }
+
+    function calcular() {
+        var presupuesto = document.getElementById("presupuesto").value;
+        var dias = document.getElementById("dias").value;
+        var cpc = document.getElementById("cpc").value;
+        var conversion = document.getElementById("conversion").value / 100;
+        var ctr = document.getElementById("ctr").value / 100;
+        var impuestoTasa = document.getElementById("impuesto").value / 100;
+
+        var gastoTotal = presupuesto * dias;
+        var clics = gastoTotal / cpc;
+        var conversiones = clics * conversion;
+        var cpa = gastoTotal / conversiones;
+        var roas = (conversiones * cpc) / gastoTotal;
+
+        // Cálculo del impuesto
+        var impuesto = gastoTotal * impuestoTasa;
+        var gastoConImpuesto = gastoTotal + impuesto;
+
+        document.getElementById("gasto").innerHTML = "Gasto Total: $" + gastoTotal.toFixed(2);
+        document.getElementById("clics").innerHTML = "Clics Estimados: " + clics.toFixed(0);
+        document.getElementById("conversiones").innerHTML = "Conversiones Estimadas: " + conversiones.toFixed(0);
+        document.getElementById("cpa").innerHTML = "Costo por Conversión (CPA): $" + cpa.toFixed(2);
+        document.getElementById("roas").innerHTML = "Retorno sobre la Inversión (ROAS): " + roas.toFixed(2);
+        document.getElementById("impuestoResult").innerHTML = "Impuesto: $" + impuesto.toFixed(2);
+        document.getElementById("gastoConImpuesto").innerHTML = "Gasto Total con Impuesto: $" + gastoConImpuesto.toFixed(2);
+
+        var ctx = document.getElementById('graficoClics').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Clics', 'Conversiones'],
+                datasets: [{
+                    label: 'Estimaciones',
+                    data: [clics, conversiones],
+                    backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+                    borderColor: ['rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+<footer class="author">
+    <p>Creado con ❤️ por <a href="#" rel="_blank">Toolkit For Marketers</a></p>
+</footer>
+
+</body>
+</html>
